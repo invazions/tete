@@ -1,0 +1,11 @@
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090
+  - job_name: sanoptes
+    scrape_interval: 3m
+    scrape_timeout: 3m
+    static_configs:
+      - targets:
+          - sanoptes:8000
