@@ -1,8 +1,13 @@
 import subprocess
 
+# nmap -F -sV 192.168.1.155 - стоковый no grepable
+# nmap -Pn -sV -oG - 192.168.1.155 для Windows
+
+# nmap --source-port=53 -F -sV -oG - -Pn 192.168.1.155 - stealth for windows
+# nmap --source-port=53 -F -sV -oG - -O 192.168.1.155 - stealth for linux
 
 def scan(hosts) -> str:
-    nmap_args = ['nmap', '-F', '-sV'] + hosts
+    nmap_args = ['nmap', '-F', '-sV', '-Pn'] + hosts
     latest_scan_result = subprocess.run(nmap_args, capture_output=True, text=True).stdout
 
     print(latest_scan_result)

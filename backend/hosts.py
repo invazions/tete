@@ -9,16 +9,30 @@ from dependencies import get_current_active_user
 from models import User
 from scans import scan
 
-database = "sqlite.db"
+database = "data/sqlite.db"
 
 with sqlite3.connect(database) as con:
     con.execute("CREATE TABLE IF NOT EXISTS hosts(hostname, state, description)")
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("scanme.nmap.org",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("scanme.nmap.org", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("testphp.vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("testphp.vulnweb.com", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("testhtml5.vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("testhtml5.vulnweb.com", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("testasp.vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("testasp.vulnweb.com", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("testaspnet.vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("testaspnet.vulnweb.com", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("rest.vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("rest.vulnweb.com", 1, "test host"))
+    if not con.execute("SELECT 1 FROM hosts WHERE hostname=?", ("vulnweb.com",)).fetchone():
+        con.execute("INSERT INTO hosts VALUES(?,?,?)", ("vulnweb.com", 1, "test host"))
 
 router = APIRouter()
 
 
 @router.post(
-    "/add_host",
+    "/hosts",
     summary="Добавить новый хост",
     tags=["Управление хостами"]
 )
@@ -38,7 +52,7 @@ async def add_host(
 
 
 @router.get(
-    "/get_hosts",
+    "/hosts",
     summary="Получить список всех хостов",
     tags=["Управление хостами"]
 )
@@ -59,12 +73,12 @@ async def metrics():
     with sqlite3.connect(database) as con:
         hosts = [r[0] for r in con.execute("SELECT hostname FROM hosts WHERE state=1").fetchall()]
     if not hosts: return {"error": "Hosts not found"}
-    return Response(content=scan(hosts), media_type="text/plain")
-
+    result = await scan(hosts)
+    return Response(content=result, media_type="text/plain")
 
 @router.post(
-    "/toggle/{hostname}",
-    summary="Переключить состояние хоста",
+    "/hosts/{hostname}/toggle",
+    summary="Откл./вкл. сканирование хоста",
     tags=["Управление хостами"]
 )
 async def toggle_host_status(

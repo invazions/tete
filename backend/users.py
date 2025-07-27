@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post(
     "/token",
-    summary="Login For Access Token - Not For Use",
+    summary="Login For Access Token",
     tags=["Администирование"]
 )
 async def login_for_access_token(
@@ -38,7 +38,8 @@ async def login_for_access_token(
 @router.get(
     "/users/me/",
     response_model=User,
-    summary="Read Users Me - Not For Use",
+    summary="Read Users Me",
+    include_in_schema=False,
     tags=["Администирование"]
 )
 async def read_users_me(
@@ -49,7 +50,8 @@ async def read_users_me(
 
 @router.get(
     "/users/me/items/",
-    summary="Read Own Items - Not For Use",
+    summary="Read Own Items",
+    include_in_schema=False,
     tags=["Администирование"])
 async def read_own_items(
         current_user: Annotated[User, Depends(get_current_active_user)],
